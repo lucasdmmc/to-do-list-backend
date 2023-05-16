@@ -1,8 +1,13 @@
 const { Router } = require('express');
 
-const taskRoutes = require("./task.routes")
+const userRoutes = require("./users.routes")
+const tasksRoutes = require("./tasks.routes")
+const sessionsRoutes = require("./sessions.routes")
+
 
 const routes = Router();
-routes.use("/task", taskRoutes)
+routes.use("/users", userRoutes);
+routes.use("/task", tasksRoutes)
+routes.use("/sessions", sessionsRoutes);
 
 module.exports = routes;

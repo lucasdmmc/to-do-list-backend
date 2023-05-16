@@ -1,18 +1,22 @@
 const knex = require("../database/knex")
 
-class TaskController {
+class TasksController {
   async create(request, response) {
     try {
-      const { id, description, finished } = request.body;
+      const { description, finished } = request.body;
+      const  user_id  = request.user.id;
 
-      const existingTask = await knex("task").where({ description }).first();
+      const existingTask = await knex("tasks").where({ description }).first();
 
       if (existingTask) {
         throw new Error("Task already exists.");
       }
 
-      const task = await knex("task").insert({ id, description, finished })
-        .returning(["id", "description", "finished"]);
+      const [task] = await knex("tasks").insert({ 
+        user_id,
+        description, 
+        finished
+      });
 
       return response.status(201).json({ task });
     } catch (error) {
@@ -22,15 +26,15 @@ class TaskController {
 
   async update(request, response) {
     try {
-      const { id } = request.params;
+      const user_id = request.user.id;
       const { description, finished } = request.body;
 
-      const existingTask = await knex("task").where({ id }).first();
+      const existingTask = await knex("tasks").where({ user_id }).first();
       if (!existingTask) {
         throw new Error("Task not found.");
       }
 
-      await knex("task").where({ id }).update({ description, finished });
+      await knex("tasks").where({ user_id }).update({ description, finished });
 
       response.status(200).json({ description, finished });
     } catch (error) {
@@ -42,12 +46,12 @@ class TaskController {
     try {
       const { id } = request.params;
 
-      const existingTask = await knex("task").where({ id }).first();
+      const existingTask = await knex("tasks").where({ id }).first();
       if (!existingTask) {
         throw new Error("Task not found.");
       }
 
-      await knex("task").where({ id }).delete();
+      await knex("tasks").where({ id }).delete();
 
       return response.status(201).send({ message: "The Task was deleted" });
     } catch (error) {
@@ -57,7 +61,7 @@ class TaskController {
 
   async index(request, response) {
     try {
-      const tasks = await knex("task").select();
+      const [tasks] = await knex("tasks").select();
 
       return response.status(200).json({ tasks });
     } catch (error) {
@@ -66,4 +70,4 @@ class TaskController {
   }
 }
 
-module.exports = TaskController;
+module.exports = TasksController;
