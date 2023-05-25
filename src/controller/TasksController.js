@@ -1,4 +1,5 @@
-const knex = require("../database/knex")
+const knex = require("../database/knex");
+const AppError = require("../utils/appError");
 
 class TasksController {
   async create(request, response) {
@@ -9,7 +10,7 @@ class TasksController {
       const existingTask = await knex("tasks").where({ description }).first();
 
       if (existingTask) {
-        throw new Error("Task already exists.");
+        throw new AppError("Task already exists.");
       }
 
       const [task] = await knex("tasks").insert({ 
@@ -31,7 +32,7 @@ class TasksController {
 
       const existingTask = await knex("tasks").where({ user_id }).first();
       if (!existingTask) {
-        throw new Error("Task not found.");
+        throw new AppError("Task not found.");
       }
 
       await knex("tasks").where({ user_id }).update({ description, finished });
@@ -48,7 +49,7 @@ class TasksController {
 
       const existingTask = await knex("tasks").where({ id }).first();
       if (!existingTask) {
-        throw new Error("Task not found.");
+        throw new AppError("Task not found.");
       }
 
       await knex("tasks").where({ id }).delete();

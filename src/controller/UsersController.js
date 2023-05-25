@@ -1,5 +1,6 @@
 const knex = require("../database/knex")
-const { hash, compare } = require("bcryptjs")
+const { hash, compare } = require("bcryptjs");
+const AppError = require("../utils/appError");
 class UsersController {
   async create(request, response) {
     try {
@@ -8,7 +9,7 @@ class UsersController {
       const userExists = await knex("users").where({ email }).first();
   
       if(userExists) {
-        throw new Error("This email is in use")
+        throw new AppError("This email is in use")
       }
 
       const hashedPassword = await hash(password, 8)

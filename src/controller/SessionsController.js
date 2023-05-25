@@ -2,21 +2,23 @@ const knex = require("../database/knex")
 const { compare } = require("bcryptjs")
 const authConfig = require("../configs/auth")
 const { sign } = require("jsonwebtoken")
+const AppError = require("../utils/appError")
 class SessionControler {
   async create(request, response) {
     try {
       const { email, password } = request.body
       
       const user = await knex("users").where({ email }).first();
+      console.log(user)
 
       if(!user) {
-        throw new Error("E-mail/password is not available")
+        throw new AppError("E-mail/password is not available")
       }
 
       const passwordMatched = await compare(password, user.password)
 
       if (!passwordMatched) {
-        throw new Error("Email/passwod is not available")
+        throw new AppError("E-mail/password is not available")
       }
 
       const { secret, expiresIn } = authConfig.jwt;
